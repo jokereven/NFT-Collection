@@ -3,7 +3,6 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./IWhitelist.sol";
 
 contract CryptoDevs is ERC721Enumerable, Ownable {
     /**
@@ -24,9 +23,6 @@ contract CryptoDevs is ERC721Enumerable, Ownable {
     // total number of tokenIds minted
     uint256 public tokenIds;
 
-    // Whitelist contract instance
-    IWhitelist whitelist;
-
     // boolean to keep track of when presale started
     bool public presaleStarted;
 
@@ -44,9 +40,8 @@ contract CryptoDevs is ERC721Enumerable, Ownable {
      * Constructor for Crypto Devs takes in the baseURI to set _baseTokenURI for the collection.
      * It also initializes an instance of whitelist interface.
      */
-    constructor (string memory baseURI, address whitelistContract) ERC721("Crypto Devs", "CD") {
+    constructor (string memory baseURI) ERC721("Crypto Devs", "CD") {
         _baseTokenURI = baseURI;
-        whitelist = IWhitelist(whitelistContract);
     }
 
     /**
@@ -60,11 +55,10 @@ contract CryptoDevs is ERC721Enumerable, Ownable {
     }
 
     /**
-     * @dev presaleMint allows an user to mint one NFT per transaction during the presale. 
+     * @dev presaleMint allows an user to mint one NFT per transaction during the presale.
      */
     function presaleMint() public payable onlyWhenNotPaused {
         require(presaleStarted && block.timestamp < presaleEnded, "Presale is not running");
-        require(whitelist.whitelistedAddresses(msg.sender), "You are not whitelisted");
         require(tokenIds < maxTokenIds, "Exceeded maximum Cypto Devs supply");
                             require(msg.value >= _price, "Ether sent is not correct");
         tokenIds += 1;
@@ -84,7 +78,7 @@ contract CryptoDevs is ERC721Enumerable, Ownable {
         tokenIds += 1;
         _safeMint(msg.sender, tokenIds);
     }
-    
+
     /**
     * @dev _baseURI overides the Openzeppelin's ERC721 implementation which by default
     * returned an empty string for the baseURI
@@ -92,16 +86,16 @@ contract CryptoDevs is ERC721Enumerable, Ownable {
     function _baseURI() internal view virtual override returns (string memory) {
         return _baseTokenURI;
     }
-     
+
     /**
     * @dev setPaused makes the contract paused or unpaused
      */
     function setPaused(bool val) public onlyOwner {
         _paused = val;
     }
- 
+
     /**
-    * @dev withdraw sends all the ether in the contract 
+    * @dev withdraw sends all the ether in the contract
     * to the owner of the contract
      */
     function withdraw() public onlyOwner  {

@@ -490,7 +490,6 @@ library Strings {
      * @dev Converts a `uint256` to its ASCII `string` decimal representation.
      */
     function toString(uint256 value) internal pure returns (string memory) {
-        // Inspired by OraclizeAPI's implementation - MIT licence
         // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
 
         if (value == 0) {
@@ -1270,19 +1269,9 @@ abstract contract Ownable is Context {
 }
 
 
-// File contracts/IWhitelist.sol
-
-pragma solidity ^0.8.4;
-
-interface IWhitelist {
-    function whitelistedAddresses(address) external view returns (bool);
-}
-
-
 // File contracts/CryptoDevs.sol
 
 pragma solidity ^0.8.4;
-
 
 
 contract CryptoDevs is ERC721Enumerable, Ownable {
@@ -1304,9 +1293,6 @@ contract CryptoDevs is ERC721Enumerable, Ownable {
     // total number of tokenIds minted
     uint256 public tokenIds;
 
-    // Whitelist contract instance
-    IWhitelist whitelist;
-
     // boolean to keep track of when presale started
     bool public presaleStarted;
 
@@ -1324,9 +1310,8 @@ contract CryptoDevs is ERC721Enumerable, Ownable {
      * Constructor for Crypto Devs takes in the baseURI to set _baseTokenURI for the collection.
      * It also initializes an instance of whitelist interface.
      */
-    constructor (string memory baseURI, address whitelistContract) ERC721("Crypto Devs", "CD") {
+    constructor (string memory baseURI) ERC721("Crypto Devs", "CD") {
         _baseTokenURI = baseURI;
-        whitelist = IWhitelist(whitelistContract);
     }
 
     /**
@@ -1344,7 +1329,6 @@ contract CryptoDevs is ERC721Enumerable, Ownable {
      */
     function presaleMint() public payable onlyWhenNotPaused {
         require(presaleStarted && block.timestamp < presaleEnded, "Presale is not running");
-        require(whitelist.whitelistedAddresses(msg.sender), "You are not whitelisted");
         require(tokenIds < maxTokenIds, "Exceeded maximum Cypto Devs supply");
                             require(msg.value >= _price, "Ether sent is not correct");
         tokenIds += 1;
