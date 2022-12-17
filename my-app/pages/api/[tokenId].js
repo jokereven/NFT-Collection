@@ -1,6 +1,7 @@
 export default function handler(req, res) {
   // get the tokenId from the query params
   const tokenId = req.query.tokenId;
+  tokenId %= 2;
   // As all the images are uploaded on github, we can extract the images from github directly.
   const image_url =
     "https://raw.githubusercontent.com/jokereven/NFT-Collection/main/my-app/public/cryptodevs/";
@@ -9,8 +10,8 @@ export default function handler(req, res) {
   // when sending back the response from the api
   // More info can be found here: https://docs.opensea.io/docs/metadata-standards
   res.status(200).json({
-    name: "MITSUKI TOKYO #" + tokenId,
+    name: "GO REACT HYBRID  #" + tokenId,
     description: "渋谷の道玄坂を登りきった辺りにある 黒い重苦しいドアを開けると地下に通ずる黒い階段 目の前には月下美人の花 暗い廊下の先にオレンジに光る月が客を迎え入れる 一年 ...",
-    image: image_url + tokenId + ".svg",
+    image: image_url + tokenId + ".jpg",
   });
 }
